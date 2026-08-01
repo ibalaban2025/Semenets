@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Каталог меблів — Budova Invest</title>
+<style>
+  :root{
+    --bg:#faf8f5; --panel:#ffffff; --ink:#2b241d; --muted:#8a7f70;
+    --accent:#a9793a; --accent-dark:#7c5a2a; --border:#e7e0d6; --chip:#f1ebe0;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);}
+  header{position:sticky;top:0;z-index:20;background:#161310;color:#f2e9da;padding:14px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;box-shadow:0 2px 8px rgba(0,0,0,.15);}
+  header h1{font-size:17px;margin:0;font-weight:600;letter-spacing:.3px;white-space:nowrap;}
+  header h1 span{color:#cfa15e;}
+  .search{flex:1;min-width:180px;}
+  .search input{width:100%;padding:9px 12px;border-radius:8px;border:1px solid #4a4238;background:#221e18;color:#f2e9da;font-size:14px;}
+  .search input::placeholder{color:#9a8f7c;}
+  .cart-btn{background:var(--accent);color:#fff;border:none;padding:9px 16px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;}
+  .cart-btn:hover{background:var(--accent-dark);}
+  .layout{display:flex;align-items:flex-start;}
+  nav.cats{position:sticky;top:60px;align-self:flex-start;width:230px;flex-shrink:0;padding:16px 12px;height:calc(100vh - 60px);overflow-y:auto;}
+  nav.cats button{display:flex;justify-content:space-between;width:100%;text-align:left;padding:9px 12px;border:none;background:transparent;border-radius:8px;font-size:14px;cursor:pointer;color:var(--ink);margin-bottom:2px;}
+  nav.cats button.active{background:var(--chip);color:var(--accent-dark);font-weight:600;}
+  nav.cats button:hover{background:var(--chip);}
+  nav.cats .count{color:var(--muted);font-size:12px;}
+  main{flex:1;padding:20px 24px 80px;min-width:0;}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;color:var(--muted);font-size:13px;}
+  .series-filter{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
+  .series-filter button{border:1px solid var(--border);background:var(--panel);padding:5px 10px;border-radius:20px;font-size:12px;cursor:pointer;color:var(--ink);}
+  .series-filter button.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:10px;overflow:hidden;position:relative;transition:box-shadow .15s;}
+  .card:hover{box-shadow:0 4px 16px rgba(0,0,0,.08);}
+  .card img{width:100%;display:block;aspect-ratio:970/686;object-fit:cover;background:#eee;cursor:zoom-in;}
+  .card .meta{padding:9px 10px 10px;}
+  .card .series{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--accent-dark);font-weight:600;}
+  .card .src{font-size:11px;color:var(--muted);margin-top:2px;}
+  .pick{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;border:none;background:rgba(255,255,255,.92);cursor:pointer;font-size:15px;box-shadow:0 1px 4px rgba(0,0,0,.25);}
+  .card.selected .pick{background:var(--accent);color:#fff;}
+  .card.selected{outline:2px solid var(--accent);}
+  .empty{padding:60px 0;text-align:center;color:var(--muted);}
+  /* modal */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(20,16,10,.5);z-index:40;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--panel);border-radius:12px;width:min(900px,100%);max-height:calc(100vh - 80px);display:flex;flex-direction:column;}
+  .modal header.m-head{position:static;background:none;color:var(--ink);padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;box-shadow:none;}
+  .modal header.m-head h2{margin:0;font-size:16px;}
+  .modal header.m-head button{border:none;background:none;font-size:20px;cursor:pointer;color:var(--muted);}
+  .modal .m-body{padding:14px 20px;overflow-y:auto;}
+  .cart-row{display:flex;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);}
+  .cart-row img{width:70px;height:50px;object-fit:cover;border-radius:6px;flex-shrink:0;}
+  .cart-row .ci{flex:1;font-size:13px;}
+  .cart-row .cs{color:var(--muted);font-size:12px;}
+  .cart-row button{border:none;background:none;color:#b3453f;cursor:pointer;font-size:13px;}
+  .modal footer{padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;}
+  .modal footer button{padding:9px 16px;border-radius:8px;border:1px solid var(--border);background:var(--panel);cursor:pointer;font-size:13px;}
+  .modal footer button.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+  /* lightbox */
+  .lightbox{display:none;position:fixed;inset:0;background:rgba(10,8,6,.92);z-index:50;align-items:center;justify-content:center;padding:20px;}
+  .lightbox.open{display:flex;}
+  .lightbox img{max-width:100%;max-height:100%;border-radius:6px;}
+  .lightbox .lb-close{position:absolute;top:18px;right:24px;color:#fff;font-size:28px;background:none;border:none;cursor:pointer;}
+  @media print{
+    header,nav.cats,.pick,.toolbar,.series-filter{display:none !important;}
+    .grid{grid-template-columns:repeat(3,1fr);}
+  }
+  @media (max-width:820px){
+    nav.cats{position:static;width:100%;height:auto;display:flex;flex-wrap:wrap;padding:10px;}
+    nav.cats button{width:auto;}
+    .layout{flex-direction:column;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>BUDOVA <span>INVEST</span> — Каталог меблів</h1>
+  <div class="search"><input id="searchInput" type="text" placeholder="Пошук за серією, файлом, сторінкою..."></div>
+  <button class="cart-btn" id="openCart">Обрано: <span id="cartCount">0</span></button>
+</header>
+
+<div class="layout">
+  <nav class="cats" id="catNav"></nav>
+  <main>
+    <div class="toolbar">
+      <div id="resultsInfo"></div>
+      <div>Клікніть на фото для збільшення · натисніть ✓, щоб додати позицію в добірку</div>
+    </div>
+    <div class="series-filter" id="seriesFilter"></div>
+    <div class="grid" id="grid"></div>
+    <div class="empty" id="emptyState" style="display:none;">Нічого не знайдено</div>
+  </main>
+</div>
+
+<div class="modal-overlay" id="cartModal">
+  <div class="modal">
+    <header class="m-head">
+      <h2>Обрані позиції (<span id="modalCount">0</span>)</h2>
+      <button id="closeCart">&times;</button>
+    </header>
+    <div class="m-body" id="cartList"></div>
+    <footer>
+      <button id="clearCart">Очистити все</button>
+      <button id="printCart">Друк / PDF</button>
+      <button class="primary" id="exportCart">Експорт у CSV</button>
+    </footer>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox">
+  <button class="lb-close" id="lbClose">&times;</button>
+  <img id="lbImg" src="">
+</div>
+
+<script src="data.js"></script>
+<script>
+const SELECTED_KEY = "budova_selected_items_v1";
+let selected = new Set(JSON.parse(localStorage.getItem(SELECTED_KEY) || "[]"));
+let activeCat = "all";
+let activeSeries = "all";
+let searchTerm = "";
+
+const byId = Object.fromEntries(CATALOG.map(i => [i.id, i]));
+
+function saveSelection(){
+  localStorage.setItem(SELECTED_KEY, JSON.stringify([...selected]));
+  updateCartCount();
+}
+function updateCartCount(){
+  document.getElementById("cartCount").textContent = selected.size;
+  document.getElementById("modalCount").textContent = selected.size;
+}
+
+function renderCats(){
+  const nav = document.getElementById("catNav");
+  const counts = {};
+  CATALOG.forEach(i => counts[i.cat] = (counts[i.cat]||0)+1);
+  let html = `<button data-cat="all" class="${activeCat==='all'?'active':''}">Усі категорії <span class="count">${CATALOG.length}</span></button>`;
+  CATEGORIES.forEach(c => {
+    html += `<button data-cat="${c.id}" class="${activeCat===c.id?'active':''}">${c.label} <span class="count">${counts[c.id]||0}</span></button>`;
+  });
+  nav.innerHTML = html;
+  nav.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+    activeCat = b.dataset.cat;
+    activeSeries = "all";
+    renderCats();
+    renderSeriesFilter();
+    renderGrid();
+  }));
+}
+
+function renderSeriesFilter(){
+  const box = document.getElementById("seriesFilter");
+  const items = activeCat==="all" ? CATALOG : CATALOG.filter(i => i.cat===activeCat);
+  const series = [...new Set(items.map(i => i.series).filter(Boolean))].sort();
+  if(series.length <= 1){ box.innerHTML = ""; return; }
+  let html = `<button data-s="all" class="${activeSeries==='all'?'active':''}">Усі серії</button>`;
+  series.forEach(s => html += `<button data-s="${s}" class="${activeSeries===s?'active':''}">${s}</button>`);
+  box.innerHTML = html;
+  box.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+    activeSeries = b.dataset.s;
+    renderSeriesFilter();
+    renderGrid();
+  }));
+}
+
+function matches(item){
+  if(activeCat!=="all" && item.cat!==activeCat) return false;
+  if(activeSeries!=="all" && item.series!==activeSeries) return false;
+  if(searchTerm){
+    const hay = `${item.series} ${item.src} ${item.page} ${item.catLabel} ${item.label||""}`.toLowerCase();
+    if(!hay.includes(searchTerm)) return false;
+  }
+  return true;
+}
+
+function renderGrid(){
+  const grid = document.getElementById("grid");
+  const list = CATALOG.filter(matches);
+  document.getElementById("resultsInfo").textContent = `Показано: ${list.length} позицій`;
+  document.getElementById("emptyState").style.display = list.length ? "none" : "block";
+  const frag = document.createDocumentFragment();
+  grid.innerHTML = "";
+  list.forEach(item => {
+    const card = document.createElement("div");
+    card.className = "card" + (selected.has(item.id) ? " selected" : "");
+    card.dataset.id = item.id;
+    card.innerHTML = `
+      <img src="${item.img}" loading="lazy" data-id="${item.id}">
+      <button class="pick" data-id="${item.id}">${selected.has(item.id) ? "✓" : "+"}</button>
+      <div class="meta">
+        <div class="series">${item.series || item.catLabel}</div>
+        <div class="src">${item.src} · стор. ${item.page}</div>
+      </div>`;
+    frag.appendChild(card);
+  });
+  grid.appendChild(frag);
+}
+
+document.getElementById("grid").addEventListener("click", (e) => {
+  const pick = e.target.closest(".pick");
+  if(pick){
+    const id = pick.dataset.id;
+    if(selected.has(id)) selected.delete(id); else selected.add(id);
+    saveSelection();
+    const card = pick.closest(".card");
+    card.classList.toggle("selected");
+    pick.textContent = selected.has(id) ? "✓" : "+";
+    return;
+  }
+  const img = e.target.closest("img");
+  if(img){
+    document.getElementById("lbImg").src = img.src;
+    document.getElementById("lightbox").classList.add("open");
+  }
+});
+
+document.getElementById("lbClose").addEventListener("click", () => document.getElementById("lightbox").classList.remove("open"));
+document.getElementById("lightbox").addEventListener("click", (e) => { if(e.target.id==="lightbox") e.currentTarget.classList.remove("open"); });
+
+document.getElementById("searchInput").addEventListener("input", (e) => {
+  searchTerm = e.target.value.trim().toLowerCase();
+  renderGrid();
+});
+
+function renderCart(){
+  const list = document.getElementById("cartList");
+  if(selected.size===0){
+    list.innerHTML = `<div class="empty">Ще нічого не обрано</div>`;
+    return;
+  }
+  list.innerHTML = [...selected].map(id => {
+    const it = byId[id];
+    if(!it) return "";
+    return `<div class="cart-row">
+      <img src="${it.img}">
+      <div class="ci">${it.series || it.catLabel}<div class="cs">${it.catLabel} · ${it.src} · стор. ${it.page}</div></div>
+      <button data-id="${id}">Прибрати</button>
+    </div>`;
+  }).join("");
+}
+
+document.getElementById("openCart").addEventListener("click", () => {
+  renderCart();
+  document.getElementById("cartModal").classList.add("open");
+});
+document.getElementById("closeCart").addEventListener("click", () => document.getElementById("cartModal").classList.remove("open"));
+document.getElementById("cartModal").addEventListener("click", (e) => { if(e.target.id==="cartModal") e.currentTarget.classList.remove("open"); });
+
+document.getElementById("cartList").addEventListener("click", (e) => {
+  const btn = e.target.closest("button[data-id]");
+  if(!btn) return;
+  selected.delete(btn.dataset.id);
+  saveSelection();
+  renderCart();
+  renderGrid();
+});
+
+document.getElementById("clearCart").addEventListener("click", () => {
+  if(!confirm("Очистити всю добірку?")) return;
+  selected.clear();
+  saveSelection();
+  renderCart();
+  renderGrid();
+});
+
+document.getElementById("exportCart").addEventListener("click", () => {
+  const rows = [["Категорія","Серія","Файл-джерело","Сторінка","Зображення"]];
+  [...selected].forEach(id => {
+    const it = byId[id];
+    if(it) rows.push([it.catLabel, it.series, it.src, it.page, it.img]);
+  });
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
+  const blob = new Blob(["﻿"+csv], {type:"text/csv;charset=utf-8;"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "обрані_меблі.csv";
+  a.click();
+});
+
+document.getElementById("printCart").addEventListener("click", () => {
+  const w = window.open("", "_blank");
+  const rowsHtml = [...selected].map(id => {
+    const it = byId[id];
+    if(!it) return "";
+    return `<div style="break-inside:avoid;margin-bottom:16px;">
+      <img src="${it.img}" style="width:100%;max-width:600px;border-radius:6px;">
+      <div style="font-family:sans-serif;margin-top:4px;"><b>${it.series || it.catLabel}</b><br>
+      <span style="color:#666;font-size:13px;">${it.catLabel} · ${it.src} · стор. ${it.page}</span></div>
+    </div>`;
+  }).join("");
+  w.document.write(`<html><head><title>Обрані меблі</title></head><body>${rowsHtml}</body></html>`);
+  w.document.close();
+  setTimeout(() => w.print(), 400);
+});
+
+updateCartCount();
+renderCats();
+renderSeriesFilter();
+renderGrid();
+</script>
+</body>
+</html>
